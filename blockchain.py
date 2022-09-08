@@ -78,9 +78,10 @@ class Blockchain:
  
 #creating a flask web app
 app = Flask(__name__)
+app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
 # creating a block chain
 blockchain = Blockchain()
-
+# minining a new block
 @app.route('/mine_block', methods=['GET'])
 def mine_block():
     previous_block = blockchain.get_previous_block()
@@ -96,3 +97,31 @@ def mine_block():
         'previous_hash':block['previous_hash'],
     }
     return jsonify(response),200
+
+# getting the full blockchain
+@app.route('/get_chain', methods=['GET'])
+def get_chain():
+    response = {
+        'chain': blockchain.chain,
+        'length': len(blockchain.chain)
+    } 
+    return jsonify(response),200
+
+# checking if bc is valid
+
+
+@app.route('/is_valid',methods=["GET"])
+def is_valid():
+    is_valid = blockchain.is_chain_valid(blockchain.chain)
+    if is_valid:
+        response = {
+            'message': 'the block chain is valid'
+        }
+    else:
+        response = {
+            'message' : 'block chain is not valid'
+        }
+    return jsonify(response), 200
+
+# running the app 
+app.run(host = '0.0.0.0', port = 5000)
